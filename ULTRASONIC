@@ -1,0 +1,30 @@
+/*File：ULTRASONIC.c*/
+/*Author:ZhangPeike*/
+/*Time: 2014.03.23*/
+/**/
+#include"common.h"
+#include"ULTRASONIC.h" //E:\Embeded Sensors\Sensors\Ultrasonic\US100产品介绍V2.01.pdf//
+void Init_Utrlasonic(void)
+{       
+  US_UART_init_struct.UART_Uartx    = US_uart_Uartx;   //使用UART5
+  US_UART_init_struct.UART_BaudRate = US_uart_BaudRate;//设置波特率9600
+  US_UART_init_struct.UART_RxPin    = US_uart_RxPin;   //接收引脚为PTE9
+  US_UART_init_struct.UART_TxPin    = US_uart_TxPin;   //发送引脚为PTE8
+  LPLD_UART_Init(US_UART_init_struct);                 //初始化UART
+}
+uint8 Data_Calculate(uint8 Data1,uint8 Data2)
+{
+  uint8 result=(Data1<<8);
+  result+=Data2;
+  return result;
+}
+uint8 Distance_Measuring(void)
+{
+  uint8 H_Data,L_Data,Distance;
+                          
+  LPLD_UART_PutChar(US_uart_Uartx, 0x55);     //
+  H_Data = LPLD_UART_GetChar(US_uart_Uartx);  //读取超声波模块串口数据，2字节
+  L_Data = LPLD_UART_GetChar(US_uart_Uartx); 
+  Distance = Data_Calculate(H_Data,L_Data);
+  return Distance;
+}
